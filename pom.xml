@@ -104,6 +104,11 @@
     </build>
 
     <dependencies>
+	    <dependency>
+            	<groupId>br.gov.lexml.parser</groupId>
+            	<artifactId>lexml-parser-input-driver</artifactId>
+            	<version>1.0.0-SNAPSHOT</version>
+	    </dependency>
         <dependency>
             <groupId>br.gov.lexml</groupId>
             <artifactId>lexml-scala-utils</artifactId>

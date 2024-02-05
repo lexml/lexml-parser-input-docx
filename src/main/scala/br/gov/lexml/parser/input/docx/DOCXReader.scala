@@ -6,6 +6,7 @@ import br.gov.lexml.scala.misc.XMLStreamUtils.collectPars
 import scala.annotation.tailrec
 import br.gov.lexml.scala.misc.CollectionUtils.{collapseBy, collapseBy3}
 import br.gov.lexml.scala.util.Entities.entities
+import scala.xml.Elem
 
 import javax.xml.stream.events.*
 import scala.language.postfixOps
@@ -215,27 +216,36 @@ object DOCXReader:
   import java.util.zip.*
 
   def readDOCX(s: InputStream): Option[scala.xml.Elem] =
+    readDOCXasPars(s).map { ps =>
+      <html>
+        <body>
+          {ps}
+        </body>
+      </html>
+    }
+
+  def readDOCXasPars(s: InputStream): Option[Seq[scala.xml.Elem]] =
     val zis = new ZipInputStream(s)
     var entry = zis.getNextEntry
     while (entry != null && entry.getName != "word/document.xml") {
       entry = zis.getNextEntry
     }
-    Option.when (entry != null):
+    Option.when(entry != null):
       val reader =
         XMLInputFactory.newFactory().createXMLEventReader(zis, "UTF-8")
       import scala.jdk.CollectionConverters._
       val events = LazyList.from(reader.asScala.collect { case e: XMLEvent =>
         e
       })
-      val pars :  LazyList[Seq[XMLEvent]] = collectPars(events)
+      val pars: LazyList[Seq[XMLEvent]] = collectPars(events)
       val textContents = pars.map(collectText)
-      val collapsed :  LazyList[IndexedSeq[Segment]] = collapseBy(textContents) {
+      val collapsed: LazyList[IndexedSeq[Segment]] = collapseBy(textContents) {
         case (l1, l2) if l1.isEmpty && l2.isEmpty => l1
       }
-      val ps = collapsed.map(segs => <p>
-          {segs.flatMap(_.toXML)}
-        </p>)
-      <html><body>{ps}</body></html>
-  end readDOCX
+      collapsed.map(segs => <p>
+        {segs.flatMap(_.toXML)}
+      </p>)
+  end readDOCXasPars
+
 end DOCXReader
 
