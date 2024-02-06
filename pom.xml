@@ -40,9 +40,10 @@
         <scala.version>3.3.1</scala.version>
         <!-- <scala.lib.version>${scala.version}.10</scala.lib.version> -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	<akka.version>2.5.32</akka.version>
-	<pekko.version>1.0.0</pekko.version>
         <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
+        <native.maven.plugin.version>0.9.28</native.maven.plugin.version>
+        <cmdline.mainClass>br.gov.lexml.parser.input.driver.docx.DOCXInputConverterMain</cmdline.mainClass>
+        <cmdline.imageName>lexml-docx-input-converter</cmdline.imageName>
     </properties>
 
     <scm>
@@ -124,13 +125,14 @@
             <artifactId>scala-xml_${scala.compat.version}</artifactId>
             <version>2.2.0</version>
         </dependency>
-	<!--
+
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.7</version>
+            <version>2.15.0</version>
+            <scope>provided</scope>
         </dependency>
-	-->
+
         <dependency>
             <groupId>com.github.scopt</groupId>
             <artifactId>scopt_${scala.compat.version}</artifactId>
@@ -222,35 +224,58 @@
        </build>
 
        </profile>
-       <profile>
-         <id>onejar</id>
-         <activation>
-           <activeByDefault>false</activeByDefault>
-         </activation>
-         <build>
-           <plugins>
-             <plugin>
-                <groupId>com.jolira</groupId>
-                <artifactId>onejar-maven-plugin</artifactId>
-                <version>1.4.4</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
+        <profile>
+            <id>native</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.graalvm.buildtools</groupId>
+                        <artifactId>native-maven-plugin</artifactId>
+                        <version>${native.maven.plugin.version}</version>
+                        <extensions>true</extensions>
+                        <executions>
+                            <execution>
+                                <id>build-native</id>
+                                <goals>
+                                    <goal>compile-no-fork</goal>
+                                </goals>
+                                <phase>package</phase>
+                            </execution>
+                            <execution>
+                                <id>test-native</id>
+                                <goals>
+                                    <goal>test</goal>
+                                </goals>
+                                <phase>test</phase>
+                            </execution>
+                        </executions>
                         <configuration>
-                            <mainClass>br.gov.lexml.input.docx.DOCX2LexML</mainClass>
-                            <attachToBuild>true</attachToBuild>
-                            <filename>${project.build.finalName}-onejar.${project.packaging}</filename>
-                            <classifier>one-jar</classifier>
+                            <!--<agent>
+                                <enabled>true</enabled>
+                            </agent> -->
+                            <imageName>${cmdline.imageName}-${project.version}</imageName>
+                            <mainClass>${cmdline.mainClass}</mainClass>
+                            <verbose>true</verbose>
+                            <!-- ... -->
                         </configuration>
-                        <goals>
-                            <goal>one-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-              </plugin> 
-            </plugins>
-         </build>
-       </profile>
+                    </plugin>
+                </plugins>
+            </build>
+            <dependencies>
+                <dependency>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
+                    <version>1.4.14</version>
+                    <scope>runtime</scope>
+                </dependency>
+                <dependency>
+                    <groupId>commons-io</groupId>
+                    <artifactId>commons-io</artifactId>
+                    <version>2.15.0</version>
+                    <scope>compile</scope>
+                </dependency>
+            </dependencies>
+        </profile>
     </profiles>
 </project>
 
