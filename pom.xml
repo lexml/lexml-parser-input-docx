@@ -3,7 +3,7 @@
 
     <groupId>br.gov.lexml.parser</groupId>
     <artifactId>lexml-parser-input-docx</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.2</version>
 
     <name>DOCX importer for LexML Parser</name>
     <description>Allows DOCX documents to be parsed by the LexML Parser.</description>
@@ -50,7 +50,7 @@
         <url>https://github.com/lexml/lexml-parser-input-docx</url>
         <developerConnection>scm:git:https://github.com/lexml/lexml-parser-input-docx.git</developerConnection>
         <connection>scm:git:https://github.com/lexml/lexml-parser-input-docx.git</connection>
-        <tag>HEAD</tag>
+        <tag>lexml-parser-input-docx-1.0.2</tag>
     </scm>
 
     <build>
